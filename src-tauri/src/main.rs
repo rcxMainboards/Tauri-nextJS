@@ -1,23 +1,31 @@
-#![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
-)]
+// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::time::{SystemTime, UNIX_EPOCH};
-
-#[tauri::command]
-fn on_button_clicked() -> String {
-    let start = SystemTime::now();
-    let since_the_epoch = start
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis();
-    format!("on_button_clicked called from Rust! (timestamp: {since_the_epoch}ms)")
+mod wmi_querys {
+    pub mod wmi_q;
 }
+
+mod windows_native {
+    pub mod wifi_test;
+}
+
+use tauri::Manager;
+use windows_native::wifi_test::test_connection;
+use wmi_querys::wmi_q::wmi_query_class;
+
+// #[tauri::command]
+// fn greet(name: &str) -> String {
+//    format!("Hello, {}! From Rust Tauri", name)
+// }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![on_button_clicked])
-        .run(tauri::generate_context!())
+        .setup(|app| {
+            #[cfg(debug_assertions)]
+            app.get_window("main").unwrap().open_devtools();
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![wmi_query_class, test_connection])
+        .run(tauri::generate_context!("./tauri.conf.json"))
         .expect("error while running tauri application");
 }
