@@ -6,19 +6,21 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "suspicious": {
+        "noArrayIndexKey": "off"
+      }
     }
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "indentWidth": 2
+    "indentWidth": 2,
+    "lineEnding": "crlf"
   },
   "javascript": {
     "formatter": {
-      "semicolons": "asNeeded",
-      "lineEnding": "lf",
-      "trailingComma": "all"
+      "lineEnding": "crlf"
     }
   }
 }
