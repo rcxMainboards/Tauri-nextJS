@@ -6,44 +6,40 @@ function Landing() {
 
   return (
     <div className="w-full grid grid-cols-3 place-content-center gap-10">
-      {" "}
       <Button
         color="secondary"
         size="lg"
         className="font-bold text-xl"
         onPress={(): void => {
           router.push("/menu").catch((error: unknown) => {
-            console.error(error);
+            throw error;
           });
         }}
       >
-        {" "}
-        Menu Tests{" "}
-      </Button>{" "}
+        Menu Tests
+      </Button>
       <Button
         size="lg"
         className="font-bold text-xl"
         onPress={(): void => {
           router.push("/login").catch((error: unknown) => {
-            console.error(error);
+            throw error;
           });
         }}
       >
-        {" "}
-        IRR-MB{" "}
-      </Button>{" "}
+        IRR-MB
+      </Button>
       <Button
         size="lg"
         className="font-bold text-xl"
         onPress={(): void => {
           router.push("/login").catch((error: unknown) => {
-            console.error(error);
+            throw error;
           });
         }}
       >
-        {" "}
-        PCaas{" "}
-      </Button>{" "}
+        PCaas
+      </Button>
     </div>
   );
 }

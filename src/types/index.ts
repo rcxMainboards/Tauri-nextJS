@@ -49,6 +49,12 @@ interface Ilogin {
   numEmployee: string;
 }
 
+interface Iresource {
+  resource: {
+    read: () => string;
+  };
+}
+
 export type {
   ItestProps,
   ItestGuide,
@@ -58,4 +64,5 @@ export type {
   IconfigTest,
   Ilogin,
   MyIcon,
+  Iresource,
 };

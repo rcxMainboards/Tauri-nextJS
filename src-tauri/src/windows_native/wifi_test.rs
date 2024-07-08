@@ -109,7 +109,8 @@ async fn start_connection_procces(ssid: String, pass: String) -> Result<String, 
 }
 
 #[tauri::command]
-pub async fn test_connection(ssid: String, pass: String) -> Result<String, String> {
+pub async fn test_connection(window: tauri::Window, ssid: String, pass: String) -> Result<String, String> {
+    window.emit("wifi-event", "A WIFI").unwrap();
     // Call another async function and wait for it to finish
     match start_connection_procces(ssid, pass).await {
         Ok(v) => Ok(format!("{v}")),

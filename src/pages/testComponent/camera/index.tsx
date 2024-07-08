@@ -1,7 +1,6 @@
 import { CameraList } from "@/components/ui";
 import { Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-// import { useTerminal } from "@/hooks";
 
 function CameraTest() {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]); // Update the type and initialize as an empty array

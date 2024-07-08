@@ -24,6 +24,7 @@
     "prefer-spread": "error",
     "prefer-template": "error",
     "radix": ["error", "always"],
+    "@typescript-eslint/only-throw-error": "off",
     "react-hooks/exhaustive-deps": "off",
     "@next/next/no-img-element": "off"
   }
