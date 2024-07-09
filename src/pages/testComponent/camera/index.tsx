@@ -7,9 +7,7 @@ function CameraTest() {
   const [loadingDevices, setLoadingDevices] = useState<boolean>(true);
 
   const handleDevices = (mediaDevices: MediaDeviceInfo[]) => {
-    const videoInputList = mediaDevices.filter(
-      ({ kind }) => kind === "videoinput",
-    );
+    const videoInputList = mediaDevices.filter(({ kind }) => kind === "videoinput");
     setDevices(videoInputList);
   };
 
@@ -42,9 +40,7 @@ function CameraTest() {
               ) : (
                 // If loadingDevices is false, show the CameraList
                 <section className="ml-3">
-                  <h1 className="font-bold text-4xl pb-10 text-white">
-                    Camaras
-                  </h1>
+                  <h1 className="font-bold text-4xl pb-10 text-white">Camaras</h1>
                   {/*Listamos las camaras encontradas*/}
                   <CameraList devices={devices} />
                 </section>

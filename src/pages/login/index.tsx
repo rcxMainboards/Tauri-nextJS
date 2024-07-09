@@ -22,9 +22,7 @@ function Login() {
     formState: { errors },
   } = useForm<Ilogin>();
 
-  const validateField = async (
-    mappedSerialNumber: string,
-  ): Promise<boolean> => {
+  const validateField = async (mappedSerialNumber: string): Promise<boolean> => {
     try {
       const results = await invoke<string>("wmi_query_class", {
         queyClass: "SELECT SerialNumber FROM Win32_BaseBoard",
@@ -66,9 +64,7 @@ function Login() {
     <section className="flex flex-1">
       <Card className="max-w-[35rem] flex-1 p-5">
         <CardHeader>
-          <h1 className="rounded-md text-4xl font-bold tracking-wider">
-            Bienvenido a IRR MB
-          </h1>
+          <h1 className="rounded-md text-4xl font-bold tracking-wider">Bienvenido a IRR MB</h1>
         </CardHeader>
         <CardBody className="mt-4 flex gap-4">
           <form

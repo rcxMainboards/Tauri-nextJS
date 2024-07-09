@@ -4,9 +4,7 @@ function CameraList({ devices }: { devices: MediaDeviceInfo[] }) {
   return (
     <ul>
       {devices.length === 0 ? (
-        <p className="text-xl text-danger-400 ml-3">
-          No se encontraron camaras disponibles
-        </p>
+        <p className="text-xl text-danger-400 ml-3">No se encontraron camaras disponibles</p>
       ) : (
         devices.map((device: MediaDeviceInfo, key: number) => {
           return (

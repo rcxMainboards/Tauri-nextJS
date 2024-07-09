@@ -2,11 +2,27 @@ import invokeFromRust from "@/lib/invokeData";
 import type { IProcess } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import { listen } from "@tauri-apps/api/event";
-import { useEffect, useState } from "react";
+import type { UnlistenFn } from "@tauri-apps/api/event";
+import { useEffect, useReducer, useState } from "react";
 
 interface TauriProcess {
   eventName?: string;
   tauriProcess: IProcess;
+}
+
+// Define the actions
+type messageActions = { type: "addMessage"; payload: string } | { type: "clearMessages" };
+
+// Define the reducer
+function messagesReducer(state: string[], action: messageActions): string[] {
+  switch (action.type) {
+    case "addMessage":
+      return [...state, action.payload];
+    case "clearMessages":
+      return [];
+    default:
+      return state;
+  }
 }
 
 /**
@@ -23,9 +39,10 @@ interface TauriProcess {
  */
 function useTauriProcess() {
   const defaultMessage = "Esperando por un proceso";
-  const [messages, setMessages] = useState([defaultMessage]);
+  const [messages, messagesDispatch] = useReducer(messagesReducer, [defaultMessage]);
   const [eventName, setEventName] = useState<string | null>(null);
   const [processToStart, setProcessToStart] = useState<IProcess | null>(null);
+  const [unlisten, setUnlisten] = useState<UnlistenFn | null>(null);
 
   const { mutate, error, data, status } = useMutation({
     mutationFn: invokeFromRust,
@@ -33,15 +50,12 @@ function useTauriProcess() {
   });
 
   const startProcess = ({ tauriProcess, eventName }: TauriProcess) => {
-    setMessages([]);
+    messagesDispatch({ type: "clearMessages" });
     if (eventName) setEventName(eventName);
     setProcessToStart(tauriProcess);
   };
 
-  useEffect(() => {
-    console.log(messages);
-  }, [messages]);
-
+  // Se encarga ejecutar la mutacion si el estado de de processStart cambia, la funcion startProcess permite inicializar estos estados
   useEffect(() => {
     if (processToStart) {
       mutate(processToStart);
@@ -51,14 +65,24 @@ function useTauriProcess() {
   }, [processToStart, mutate]);
 
   useEffect(() => {
-    let unlisten: () => void;
+    // Si se ejecuto una mutación y esta ha terminado (ya sea con éxito o con error), llama a unlisten para limpiar el evento.
+    if (data ?? error) {
+      if (unlisten) {
+        unlisten();
+      }
+    }
+  }, [data, error, unlisten]); // Dependencias
 
+  // Si se recibe un evento, se suscribe a el, y guarda cada mensaje generado en un estado.
+  // Tambien inicializa un estado de `Unlisten` para cortar la escucha del evento cuando sea necesario.
+  // Tambien desmontar el componente se elimina el la escucha del evento.
+  useEffect(() => {
     if (eventName) {
-      // Verificar si eventName está definido
       (async () => {
-        unlisten = await listen<string>(eventName, (event) => {
-          setMessages((prevMessages) => [...prevMessages, event.payload]);
+        const unlistenFn = await listen<string>(eventName, (event) => {
+          messagesDispatch({ type: "addMessage", payload: event.payload });
         });
+        setUnlisten(() => unlistenFn); // Actualiza el estado unlisten
       })().catch((error: unknown) => {
         console.error("Error listening to event:", error);
       });
@@ -70,7 +94,7 @@ function useTauriProcess() {
         unlisten();
       }
     };
-  }, [eventName]);
+  }, [eventName, unlisten]);
 
   return { startProcess, error, data, status, messages };
 }
