@@ -45,13 +45,16 @@ fn find_network(
 }
 
 async fn connect_to_network(
+    window: &tauri::Window,
     adapter: WiFiAdapter,
     network: WiFiAvailableNetwork,
     password_credential: PasswordCredential,
 ) -> Result<(), String> {
-    println!("Let's connect to that specific network");
+    // emit to window
+    window.emit("wifi-event", "Tratando de iniciar con una conexión con la red").unwrap();
 
     let kind = WiFiReconnectionKind::Manual;
+
     let operation: IAsyncOperation<WiFiConnectionResult> = adapter
         .ConnectWithPasswordCredentialAsync(
             &network,
@@ -63,9 +66,9 @@ async fn connect_to_network(
     let con_result: WiFiConnectionResult = operation.await.map_err(|e| e.to_string())?;
     let con_status: WiFiConnectionStatus =
         con_result.ConnectionStatus().map_err(|e| e.to_string())?;
+
     match con_status.0 {
         1 => {
-            println!("Conexión exitosa");
             Ok(())
         }
         2 => Err("Conexión a la red Revocada".to_string()),
@@ -79,12 +82,12 @@ async fn connect_to_network(
 }
 
 async fn disconnect_from_network(adapter: WiFiAdapter) -> Result<(), String> {
-    println!("Desconectandose de la red");
+    // println!("Desconectandose de la red");
     adapter.Disconnect().map_err(|e| e.to_string())?;
     Ok(())
 }
 
-async fn start_connection_procces(ssid: String, pass: String) -> Result<String, String> {
+async fn start_connection_procces(window: &tauri::Window, ssid: String, pass: String) -> Result<String, String> {
     let adapters: IVectorView<WiFiAdapter> = get_wifi_adapters().await?;
     let first_adapter = get_first_adapter(adapters)?;
     let networks = get_networks(first_adapter.clone()).await?;
@@ -98,10 +101,11 @@ async fn start_connection_procces(ssid: String, pass: String) -> Result<String, 
 
     match find_network(networks, desired_ssid) {
         Ok(Some(network)) => {
-            println!("Found network with SSID: {}", desired_ssid);
-            connect_to_network(first_adapter.clone(), network, password_credential.clone()).await?;
+            // println!("Found network with SSID: {}", desired_ssid);
+            window.emit("wifi-event", format!("Se encontro la red {}", desired_ssid)).unwrap();
+            connect_to_network(&window, first_adapter.clone(), network, password_credential.clone()).await?;
             disconnect_from_network(first_adapter).await?;
-            Ok("Connected and disconnected successfully".to_string())
+            Ok("Se conecto y desconecto de la red de forma exitosa".to_string())
         }
         Ok(None) => Err(format!("No encontro la red objetivo {}", desired_ssid)),
         Err(e) => Err(e),
@@ -110,9 +114,9 @@ async fn start_connection_procces(ssid: String, pass: String) -> Result<String, 
 
 #[tauri::command]
 pub async fn test_connection(window: tauri::Window, ssid: String, pass: String) -> Result<String, String> {
-    window.emit("wifi-event", "A WIFI").unwrap();
+    window.emit("wifi-event", "Iniciando prueba de WIFI").unwrap();
     // Call another async function and wait for it to finish
-    match start_connection_procces(ssid, pass).await {
+    match start_connection_procces(&window, ssid, pass).await {
         Ok(v) => Ok(format!("{v}")),
         Err(e) => Err(format!("{e}")),
     }

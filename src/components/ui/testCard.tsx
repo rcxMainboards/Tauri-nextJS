@@ -1,6 +1,5 @@
 import type { MyIcon } from "@/types";
-import { Card, CardBody } from "@nextui-org/react";
-import { useRouter } from "next/router";
+import { Card, CardBody, Link } from "@nextui-org/react";
 
 function TestCard({
   Icon,
@@ -11,18 +10,13 @@ function TestCard({
   Description: JSX.Element;
   url: string;
 }) {
-  const router = useRouter();
-
   return (
     <Card
       isHoverable
       className="bg-blue-700"
       isPressable
-      onPress={() => {
-        router.push(url).catch((error: unknown) => {
-          console.error(error);
-        });
-      }}
+      as={Link}
+      href={url}
       shadow="lg"
     >
       <CardBody className="flex flex-col gap-2 items-center">

@@ -1,25 +1,29 @@
-import { RustResponse, Terminal } from "@/components/ui";
-import invokeFromRust from "@/lib/invokeData";
-import { Button } from "@nextui-org/react";
-import { Suspense, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import {
+  Terminal,
+  TerminalMessages,
+  TerminalProcessOutput,
+} from "@/components/ui";
+import { useTauriProcess } from "@/hooks";
+import { Button, ButtonGroup } from "@nextui-org/react";
+
+const process = {
+  action: "test_connection",
+  params: {
+    ssid: "TEST-NOTEBOOK_5G",
+    pass: "Notebook05@",
+  },
+};
+
+const process2 = {
+  action: "test_connection",
+  params: {
+    ssid: "TEST-NOTEBOOK_5G",
+    pass: "Notebook05@",
+  },
+};
 
 function Wifi() {
-  const [resource, setResource] = useState<null | {
-    read: () => string;
-  }>(null);
-
-  const handleClick = () => {
-    const process = {
-      action: "test_connection",
-      params: {
-        ssid: "TEST-Electron",
-        pass: "Electron24@",
-      },
-    };
-
-    setResource(invokeFromRust(process));
-  };
+  const { startProcess, data, error, status, messages } = useTauriProcess();
 
   return (
     <>
@@ -29,19 +33,36 @@ function Wifi() {
           <h2 className="text-white font-semibold text-lg">
             Pruebas disponibles:
           </h2>
-          <section className="w-1/2 flex flex-col gap-5">
-            <Button size="md" onClick={handleClick}>
-              Probar Config a
-            </Button>
+          <section className="flex flex-col gap-5">
+            <ButtonGroup size="lg">
+              <Button
+                isLoading={status === "pending"}
+                onClick={() => {
+                  startProcess({
+                    tauriProcess: process,
+                    eventName: "wifi-event",
+                  });
+                }}
+              >
+                Probar Config A
+              </Button>
+              <Button
+                isLoading={status === "pending"}
+                onClick={() => {
+                  startProcess({
+                    tauriProcess: process2,
+                    eventName: "wifi-event",
+                  });
+                }}
+              >
+                Probar Config B
+              </Button>
+            </ButtonGroup>
           </section>
         </div>
         <Terminal>
-          <p>* Elige una opción</p>
-          <ErrorBoundary fallback={<p className="text-white">Rust problema</p>}>
-            <Suspense fallback={<p>Cargando cosas de RUST</p>}>
-              {resource && <RustResponse resource={resource} />}
-            </Suspense>
-          </ErrorBoundary>
+          <TerminalMessages messages={messages} />
+          <TerminalProcessOutput type={data ?? error} />
         </Terminal>
       </section>
     </>

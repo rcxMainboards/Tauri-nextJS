@@ -49,11 +49,16 @@ interface Ilogin {
   numEmployee: string;
 }
 
-interface Iresource {
-  resource: {
-    read: () => string;
-  };
+interface IProcess {
+  action: string;
+  params?: Record<string, string | number>;
 }
+
+// interface Iresource {
+//   resource: {
+//     read: () => string;
+//   };
+// }
 
 export type {
   ItestProps,
@@ -64,5 +69,6 @@ export type {
   IconfigTest,
   Ilogin,
   MyIcon,
-  Iresource,
+  IProcess,
+  // Iresource,
 };
