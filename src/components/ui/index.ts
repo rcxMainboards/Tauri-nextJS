@@ -6,3 +6,4 @@ export { default as MenuTestList } from "./menuTestList";
 export { default as RustResponse } from "./rustResponse";
 export { default as TerminalMessages } from "./terminalMessages";
 export { default as TerminalProcessOutput } from "./terminalProcessOutput";
+export { default as TauriButton } from "./tauriButton";

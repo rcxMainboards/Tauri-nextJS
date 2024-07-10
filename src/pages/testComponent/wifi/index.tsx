@@ -1,21 +1,24 @@
-import { Terminal, TerminalMessages, TerminalProcessOutput } from "@/components/ui";
+import { TauriButton, Terminal, TerminalMessages, TerminalProcessOutput } from "@/components/ui";
 import { useTauriProcess } from "@/hooks";
-import { Button, ButtonGroup } from "@nextui-org/react";
+import type { IProcess } from "@/types";
+import { ButtonGroup } from "@nextui-org/react";
 
-const process = {
+const process: IProcess = {
   action: "test_connection",
   args: {
     ssid: "TEST-NOTEBOOK_5G",
     pass: "Notebook05@",
   },
+  eventName: "wifi-event",
 };
 
-const process2 = {
+const process2: IProcess = {
   action: "test_connection",
   args: {
     ssid: "TEST-Electron",
     pass: "Electron24@",
   },
+  eventName: "wifi-event",
 };
 
 function Wifi() {
@@ -29,32 +32,20 @@ function Wifi() {
           <h2 className="text-white font-semibold text-lg">Pruebas disponibles:</h2>
           <section className="flex flex-col gap-5">
             <ButtonGroup size="lg">
-              <Button
+              <TauriButton
+                process={process}
+                startProcess={startProcess}
                 isLoading={status === "pending"}
-                onClick={() => {
-                  startProcess({
-                    params: process,
-                    eventName: "wifi-event",
-                  }).catch((err: unknown) => {
-                    console.error(err);
-                  });
-                }}
               >
-                Probar Config A
-              </Button>
-              <Button
+                Probar config a
+              </TauriButton>
+              <TauriButton
+                process={process2}
+                startProcess={startProcess}
                 isLoading={status === "pending"}
-                onClick={() => {
-                  startProcess({
-                    params: process2,
-                    eventName: "wifi-event",
-                  }).catch((err: unknown) => {
-                    console.error(err);
-                  });
-                }}
               >
-                Probar Config B
-              </Button>
+                Probar config b
+              </TauriButton>
             </ButtonGroup>
           </section>
         </div>

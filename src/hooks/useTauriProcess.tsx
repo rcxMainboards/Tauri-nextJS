@@ -5,11 +5,6 @@ import { listen } from "@tauri-apps/api/event";
 import type { UnlistenFn } from "@tauri-apps/api/event";
 import { useEffect, useReducer, useState } from "react";
 
-interface TauriProcess {
-  params: IProcess;
-  eventName?: string;
-}
-
 // Define the actions
 type messageActions = { type: "addMessage"; payload: string } | { type: "clearMessages" };
 
@@ -40,7 +35,7 @@ function messagesReducer(state: string[], action: messageActions): string[] {
 function useTauriProcess() {
   const defaultMessage = "Esperando por un proceso";
   const [messages, messagesDispatch] = useReducer(messagesReducer, [defaultMessage]);
-  const [tauriProcess, setTauriProcess] = useState<TauriProcess | null>();
+  const [tauriProcess, setTauriProcess] = useState<IProcess | null>();
   const [unlisten, setUnlisten] = useState<UnlistenFn | null>(null);
 
   const { mutate, error, data, status } = useMutation({
@@ -48,7 +43,7 @@ function useTauriProcess() {
     retry: false,
   });
 
-  const startProcess = async (tauriProcess: TauriProcess) => {
+  const startProcess = async (tauriProcess: IProcess) => {
     // Si se ejecuta la funcion por segunda vez limpia los mensajes
     messagesDispatch({ type: "clearMessages" });
     // Si la primera vez se suscribio a un evento, limpialo en caso de que se coloque un nuevo evento
@@ -62,7 +57,7 @@ function useTauriProcess() {
   // Se encarga ejecutar la mutacion si el estado de de processStart cambia, la funcion startProcess permite inicializar estos estados
   useEffect(() => {
     if (tauriProcess) {
-      mutate(tauriProcess.params);
+      mutate(tauriProcess);
     }
   }, [tauriProcess, mutate]);
 
@@ -76,7 +71,7 @@ function useTauriProcess() {
   // Si se recibe un evento, se suscribe a el, y guarda cada mensaje generado en un estado.
   // Tambien inicializa un estado de `Unlisten` para cortar la escucha del evento cuando sea necesario.
   // Tambien desmontar el componente se elimina el la escucha del evento.
-  const createTauriEventListener = async (tauriProcess: TauriProcess) => {
+  const createTauriEventListener = async (tauriProcess: IProcess) => {
     if (tauriProcess.eventName) {
       const tauriEventUnlisten: UnlistenFn = await listen<string>(
         tauriProcess.eventName,

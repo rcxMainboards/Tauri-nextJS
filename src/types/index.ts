@@ -52,13 +52,8 @@ interface Ilogin {
 interface IProcess {
   action: string;
   args?: Record<string, string | number>;
+  eventName?: string;
 }
-
-// interface Iresource {
-//   resource: {
-//     read: () => string;
-//   };
-// }
 
 export type {
   ItestProps,
@@ -70,5 +65,4 @@ export type {
   Ilogin,
   MyIcon,
   IProcess,
-  // Iresource,
 };
