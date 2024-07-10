@@ -6,8 +6,8 @@ import type { UnlistenFn } from "@tauri-apps/api/event";
 import { useEffect, useReducer, useState } from "react";
 
 interface TauriProcess {
+  params: IProcess;
   eventName?: string;
-  tauriProcess: IProcess;
 }
 
 // Define the actions
@@ -40,8 +40,7 @@ function messagesReducer(state: string[], action: messageActions): string[] {
 function useTauriProcess() {
   const defaultMessage = "Esperando por un proceso";
   const [messages, messagesDispatch] = useReducer(messagesReducer, [defaultMessage]);
-  const [eventName, setEventName] = useState<string | null>(null);
-  const [processToStart, setProcessToStart] = useState<IProcess | null>(null);
+  const [tauriProcess, setTauriProcess] = useState<TauriProcess | null>();
   const [unlisten, setUnlisten] = useState<UnlistenFn | null>(null);
 
   const { mutate, error, data, status } = useMutation({
@@ -49,52 +48,55 @@ function useTauriProcess() {
     retry: false,
   });
 
-  const startProcess = ({ tauriProcess, eventName }: TauriProcess) => {
+  const startProcess = async (tauriProcess: TauriProcess) => {
+    // Si se ejecuta la funcion por segunda vez limpia los mensajes
     messagesDispatch({ type: "clearMessages" });
-    if (eventName) setEventName(eventName);
-    setProcessToStart(tauriProcess);
+    // Si la primera vez se suscribio a un evento, limpialo en caso de que se coloque un nuevo evento
+    if (typeof unlisten === "function") {
+      unlisten();
+    }
+    await createTauriEventListener(tauriProcess);
+    setTauriProcess(tauriProcess);
   };
 
   // Se encarga ejecutar la mutacion si el estado de de processStart cambia, la funcion startProcess permite inicializar estos estados
   useEffect(() => {
-    if (processToStart) {
-      mutate(processToStart);
-      setProcessToStart(null);
-      setEventName(null);
+    if (tauriProcess) {
+      mutate(tauriProcess.params);
     }
-  }, [processToStart, mutate]);
+  }, [tauriProcess, mutate]);
 
   useEffect(() => {
-    // Si se ejecuto una mutación y esta ha terminado (ya sea con éxito o con error), llama a unlisten para limpiar el evento.
+    // Si se ejecuto una mutación y esta ha terminado (ya sea con éxito o con error), se elimina el tauriProcess creado.
     if (data ?? error) {
-      if (unlisten) {
-        unlisten();
-      }
+      setTauriProcess(null);
     }
-  }, [data, error, unlisten]); // Dependencias
+  }, [data, error]); // Dependencias
 
   // Si se recibe un evento, se suscribe a el, y guarda cada mensaje generado en un estado.
   // Tambien inicializa un estado de `Unlisten` para cortar la escucha del evento cuando sea necesario.
   // Tambien desmontar el componente se elimina el la escucha del evento.
-  useEffect(() => {
-    if (eventName) {
-      (async () => {
-        const unlistenFn = await listen<string>(eventName, (event) => {
+  const createTauriEventListener = async (tauriProcess: TauriProcess) => {
+    if (tauriProcess.eventName) {
+      const tauriEventUnlisten: UnlistenFn = await listen<string>(
+        tauriProcess.eventName,
+        (event) => {
           messagesDispatch({ type: "addMessage", payload: event.payload });
-        });
-        setUnlisten(() => unlistenFn); // Actualiza el estado unlisten
-      })().catch((error: unknown) => {
-        console.error("Error listening to event:", error);
-      });
+        },
+      );
+      setUnlisten(() => tauriEventUnlisten);
     }
+  };
 
-    // Cleanup function
+  useEffect(() => {
+    // Esta función se ejecuta cuando el componente se desmonta
     return () => {
-      if (typeof unlisten === "function") {
+      // Si existe una función de desuscripción, la ejecuta
+      if (unlisten) {
         unlisten();
       }
     };
-  }, [eventName, unlisten]);
+  }, [unlisten]);
 
   return { startProcess, error, data, status, messages };
 }

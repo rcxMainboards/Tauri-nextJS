@@ -4,7 +4,7 @@ import { Button, ButtonGroup } from "@nextui-org/react";
 
 const process = {
   action: "test_connection",
-  params: {
+  args: {
     ssid: "TEST-NOTEBOOK_5G",
     pass: "Notebook05@",
   },
@@ -12,7 +12,7 @@ const process = {
 
 const process2 = {
   action: "test_connection",
-  params: {
+  args: {
     ssid: "TEST-Electron",
     pass: "Electron24@",
   },
@@ -33,8 +33,10 @@ function Wifi() {
                 isLoading={status === "pending"}
                 onClick={() => {
                   startProcess({
-                    tauriProcess: process,
+                    params: process,
                     eventName: "wifi-event",
+                  }).catch((err: unknown) => {
+                    console.error(err);
                   });
                 }}
               >
@@ -44,8 +46,10 @@ function Wifi() {
                 isLoading={status === "pending"}
                 onClick={() => {
                   startProcess({
-                    tauriProcess: process2,
+                    params: process2,
                     eventName: "wifi-event",
+                  }).catch((err: unknown) => {
+                    console.error(err);
                   });
                 }}
               >

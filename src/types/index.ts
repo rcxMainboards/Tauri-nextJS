@@ -51,7 +51,7 @@ interface Ilogin {
 
 interface IProcess {
   action: string;
-  params?: Record<string, string | number>;
+  args?: Record<string, string | number>;
 }
 
 // interface Iresource {

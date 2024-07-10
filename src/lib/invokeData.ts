@@ -9,7 +9,7 @@ import type { IProcess } from "@/types";
 // }
 
 async function invokeFromRust(process: IProcess): Promise<string | Error> {
-  return invoke<string>(process.action, { ...process.params })
+  return invoke<string>(process.action, { ...process.args })
     .then((res) => res)
     .catch((err: unknown) => {
       // El error retornano es un string, que convertimos a una instancia de error en TS
