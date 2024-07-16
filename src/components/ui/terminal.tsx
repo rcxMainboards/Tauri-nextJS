@@ -6,7 +6,7 @@ function Terminal({ children }: { children: React.ReactNode }) {
         <p className="font-semibold p-3">21400@irrmb: ~</p>
       </section>
       {/* <!-- Terminal Body -->         */}
-      <section className="bg-black text-white shadow-lg opacity-90 p-3 rounded-b-lg overflow-hidden h-full">
+      <section className="bg-black shadow-lg opacity-90 p-3 rounded-b-lg overflow-hidden h-full">
         <ul>{children}</ul>
       </section>
     </article>

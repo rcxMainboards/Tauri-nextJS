@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <main className="flex min-h-screen dark flex-col pattern-bg p-10"> {children} </main>;
+  return <main className="flex min-h-screen flex-col p-10"> {children} </main>;
 }

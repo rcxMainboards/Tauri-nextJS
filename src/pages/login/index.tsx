@@ -64,7 +64,7 @@ function Login() {
     <section className="flex flex-1">
       <Card className="max-w-[35rem] flex-1 p-5">
         <CardHeader>
-          <h1 className="rounded-md text-4xl font-bold tracking-wider">Bienvenido a IRR MB</h1>
+          <h1 className="rounded-md text-4xl font-bold">Bienvenido a IRR MB</h1>
         </CardHeader>
         <CardBody className="mt-4 flex gap-4">
           <form
@@ -114,11 +114,11 @@ function Login() {
           </form>
         </CardBody>
       </Card>
-      <div className="flex flex-1 items-center justify-center">
-        <div className="animate-spin">
-          <img alt="logo" width={300} height={300} src={"/logo.png"} />
+      <aside className="flex flex-1 items-center justify-center">
+        <div className="animate-spin shadow-xl border rounded-lg p-2">
+          <img alt="logo" src={"/logo.png"} />
         </div>
-      </div>
+      </aside>
     </section>
   );
 }

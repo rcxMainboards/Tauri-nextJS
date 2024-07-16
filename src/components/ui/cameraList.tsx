@@ -17,7 +17,7 @@ function CameraList({ devices }: { devices: MediaDeviceInfo[] }) {
                   width={500}
                   videoConstraints={{ deviceId: device.deviceId }}
                 />
-                <div className="text-white">
+                <div>
                   <h2 className="font-semibold">Descripcion de camara:</h2>
                   <p className="py-1 underline">
                     {device.label || `Device ${(key + 1).toString()}`}

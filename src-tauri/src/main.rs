@@ -13,10 +13,10 @@ use tauri::Manager;
 use windows_native::wifi_test::test_connection;
 use wmi_querys::wmi_q::wmi_query_class;
 
-// #[tauri::command]
-// fn greet(name: &str) -> String {
-//    format!("Hello, {}! From Rust Tauri", name)
-// }
+#[tauri::command]
+fn greet(name: &str) -> String {
+   format!("Hello, {}! From Rust Tauri", name)
+}
 
 fn main() {
     tauri::Builder::default()
@@ -25,7 +25,7 @@ fn main() {
             app.get_window("main").unwrap().open_devtools();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![wmi_query_class, test_connection])
+        .invoke_handler(tauri::generate_handler![wmi_query_class, test_connection, greet])
         .run(tauri::generate_context!("./tauri.conf.json"))
         .expect("error while running tauri application");
 }

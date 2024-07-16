@@ -11,7 +11,7 @@ function TestCard({
   url: string;
 }) {
   return (
-    <Card isHoverable className="bg-blue-700" isPressable as={Link} href={url} shadow="lg">
+    <Card isHoverable isPressable as={Link} href={url}>
       <CardBody className="flex flex-col gap-2 items-center">
         <Icon className={"size-10"} />
         {Description}
